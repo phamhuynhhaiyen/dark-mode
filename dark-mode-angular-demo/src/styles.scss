@@ -1,0 +1,111 @@
+@import '@angular/material/prebuilt-themes/azure-blue.css';
+
+html {
+  color-scheme: light;
+
+  --color-bg: #f4f7fb;
+  --color-surface: #ffffff;
+  --color-surface-subtle: #eef3f9;
+  --color-border: #d7deea;
+  --color-text: #10203f;
+  --color-text-muted: #5c6b8a;
+  --color-accent: #2663eb;
+  --color-accent-contrast: #ffffff;
+  --color-success: #0e9f6e;
+  --chart-grid: #dbe3f0;
+  --chart-line: #2663eb;
+  --chart-fill: rgba(38, 99, 235, 0.14);
+  --code-bg: #f7f9fc;
+  --shadow-lg: 0 18px 48px rgba(15, 23, 42, 0.08);
+}
+
+html.dark {
+  color-scheme: dark;
+
+  --color-bg: #07111f;
+  --color-surface: #0f172a;
+  --color-surface-subtle: #162033;
+  --color-border: #334155;
+  --color-text: #e2e8f0;
+  --color-text-muted: #9aa9c2;
+  --color-accent: #60a5fa;
+  --color-accent-contrast: #08111f;
+  --color-success: #34d399;
+  --chart-grid: #223048;
+  --chart-line: #60a5fa;
+  --chart-fill: rgba(96, 165, 250, 0.18);
+  --code-bg: #111a2c;
+  --shadow-lg: 0 18px 48px rgba(2, 6, 23, 0.42);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(38, 99, 235, 0.1), transparent 26%),
+    linear-gradient(180deg, #f8fbff 0%, var(--color-bg) 100%);
+  color: var(--color-text);
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    border-color 180ms ease;
+}
+
+html.dark body {
+  background:
+    radial-gradient(circle at top left, rgba(96, 165, 250, 0.12), transparent 24%),
+    linear-gradient(180deg, #08111f 0%, var(--color-bg) 100%);
+}
+
+body .mat-mdc-card,
+body .mat-mdc-form-field {
+  color: var(--color-text);
+}
+
+html .mat-mdc-card,
+html .mat-mdc-form-field,
+html .mat-mdc-select-panel,
+html .mat-mdc-menu-panel {
+  --mdc-filled-text-field-container-color: var(--color-surface);
+  --mdc-outlined-text-field-outline-color: var(--color-border);
+  --mdc-outlined-text-field-focus-outline-color: var(--color-accent);
+  --mdc-outlined-text-field-input-text-color: var(--color-text);
+  --mdc-outlined-text-field-label-text-color: var(--color-text-muted);
+  --mdc-filled-button-container-color: var(--color-accent);
+  --mdc-filled-button-label-text-color: var(--color-accent-contrast);
+  --mdc-chip-outline-color: var(--color-border);
+  --mdc-chip-label-text-color: var(--color-text);
+  --mdc-dialog-container-color: var(--color-surface);
+  --mat-sys-surface: var(--color-surface);
+  --mat-sys-surface-container: var(--color-surface-subtle);
+  --mat-sys-on-surface: var(--color-text);
+  --mat-sys-on-surface-variant: var(--color-text-muted);
+  --mat-sys-outline: var(--color-border);
+  --mat-sys-primary: var(--color-accent);
+}
+
+html.dark .mat-mdc-form-field-icon-suffix,
+html.dark .mat-mdc-select-arrow,
+html.dark .mat-mdc-select-value-text,
+html.dark .mdc-floating-label,
+html.dark .mat-mdc-input-element,
+html.dark .mat-mdc-card-subtitle,
+html.dark .mat-mdc-card-title,
+html.dark .mat-mdc-button,
+html.dark .mat-mdc-outlined-button,
+html.dark .mat-mdc-chip,
+html.dark .mdc-list-item__primary-text {
+  color: var(--color-text) !important;
+}
+
+html.dark .mat-mdc-select-panel,
+html.dark .mat-mdc-autocomplete-panel {
+  background: var(--color-surface) !important;
+}

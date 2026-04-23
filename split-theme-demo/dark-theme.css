@@ -1,0 +1,58 @@
+body {
+  background: #0f172a;
+  color: #f8fafc;
+}
+
+.eyebrow {
+  color: #60a5fa;
+}
+
+.theme-toggle {
+  border: 1px solid #475569;
+  background: #1e293b;
+  color: #f8fafc;
+}
+
+.theme-toggle:hover {
+  background: #334155;
+}
+
+.panel,
+.code-panel {
+  border-color: #334155;
+  background: #1e293b;
+}
+
+.panel p {
+  color: #cbd5e1;
+}
+
+.primary-action {
+  border: 0;
+  background: #3b82f6;
+  color: #ffffff;
+}
+
+.secondary-action {
+  border: 1px solid #475569;
+  background: #1e293b;
+  color: #f8fafc;
+}
+
+.invoice-row {
+  border-color: #334155;
+  background: #0f172a;
+}
+
+.invoice-row span {
+  color: #94a3b8;
+}
+
+.code-title {
+  border-bottom-color: #334155;
+  background: #0f172a;
+}
+
+pre {
+  color: #cbd5e1;
+}

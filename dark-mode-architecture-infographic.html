@@ -1,0 +1,816 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dark Mode Implementation Architecture</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #eef3ff;
+        --panel: rgba(255, 255, 255, 0.84);
+        --panel-strong: #ffffff;
+        --text: #10203f;
+        --muted: #5c6b8a;
+        --line: rgba(80, 112, 196, 0.18);
+        --shadow: 0 24px 70px rgba(26, 44, 88, 0.12);
+        --blue: #2663eb;
+        --blue-soft: #edf4ff;
+        --purple: #6b3df0;
+        --purple-soft: #f3efff;
+        --green: #0e9f6e;
+        --green-soft: #eafaf3;
+        --orange: #f59e0b;
+        --orange-soft: #fff6e5;
+        --ink: #0f172a;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        background:
+          radial-gradient(circle at top left, rgba(107, 61, 240, 0.1), transparent 28%),
+          radial-gradient(circle at top right, rgba(38, 99, 235, 0.12), transparent 24%),
+          linear-gradient(180deg, #f8fbff 0%, var(--bg) 100%);
+        color: var(--text);
+      }
+
+      .page {
+        width: min(1600px, 100vw);
+        min-height: 900px;
+        aspect-ratio: 16 / 9;
+        margin: 0 auto;
+        padding: 24px 28px 26px;
+      }
+
+      .hero {
+        text-align: center;
+        margin-bottom: 18px;
+      }
+
+      .hero h1 {
+        margin: 0;
+        font-size: 74px;
+        line-height: 0.96;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0;
+        background: linear-gradient(90deg, #6b3df0 0%, #2663eb 46%, #0f172a 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .hero p {
+        margin: 10px auto 0;
+        max-width: 760px;
+        color: var(--muted);
+        font-size: 22px;
+      }
+
+      .hero-rule {
+        width: min(850px, 90%);
+        height: 2px;
+        margin: 14px auto 0;
+        border-radius: 999px;
+        background: linear-gradient(90deg, rgba(38, 99, 235, 0), rgba(38, 99, 235, 0.88), rgba(38, 99, 235, 0));
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 260px minmax(0, 1fr) 260px;
+        gap: 18px;
+        align-items: start;
+      }
+
+      .side-panel,
+      .board,
+      .key-idea {
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(12px);
+      }
+
+      .side-panel {
+        padding: 18px 16px 18px;
+      }
+
+      .pill-title {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 48px;
+        border-radius: 999px;
+        padding: 0 18px;
+        color: #fff;
+        font-size: 15px;
+        font-weight: 800;
+        text-transform: uppercase;
+        background: linear-gradient(135deg, var(--purple), #295df0);
+        box-shadow: 0 14px 28px rgba(72, 73, 182, 0.24);
+      }
+
+      .side-intro {
+        margin: 12px 4px 8px;
+        color: var(--text);
+        font-size: 16px;
+        line-height: 1.4;
+      }
+
+      .flow {
+        display: grid;
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .step {
+        position: relative;
+        padding: 12px 12px 12px 60px;
+        border-radius: 16px;
+        background: var(--panel-strong);
+        border: 1px solid var(--line);
+      }
+
+      .step:not(:last-child)::after {
+        content: "";
+        position: absolute;
+        left: 32px;
+        top: calc(100% + 3px);
+        width: 2px;
+        height: 14px;
+        background: linear-gradient(180deg, rgba(107, 61, 240, 0.9), rgba(38, 99, 235, 0.3));
+      }
+
+      .step-badge {
+        position: absolute;
+        left: 12px;
+        top: 12px;
+        width: 36px;
+        height: 36px;
+        display: grid;
+        place-items: center;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--purple-soft), #eef3ff);
+        color: var(--purple);
+        font-size: 16px;
+        font-weight: 900;
+      }
+
+      .step strong,
+      .reason strong {
+        display: block;
+        font-size: 16px;
+      }
+
+      .step p,
+      .reason p {
+        margin: 6px 0 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.45;
+      }
+
+      .board {
+        padding: 16px;
+      }
+
+      .board-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 64px;
+        margin: -4px auto 14px;
+        padding: 0 22px;
+        border-radius: 20px;
+        width: min(760px, 94%);
+        background: linear-gradient(180deg, #14284d 0%, #0f1f3a 100%);
+        color: #fff;
+        font-size: 17px;
+        font-weight: 800;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(15, 31, 58, 0.24);
+      }
+
+      .layer {
+        position: relative;
+        display: grid;
+        grid-template-columns: 300px minmax(0, 1fr);
+        gap: 16px;
+        margin-bottom: 14px;
+        padding: 16px;
+        border-radius: 20px;
+        border: 1px solid;
+        background: var(--panel-strong);
+      }
+
+      .layer:last-of-type {
+        margin-bottom: 0;
+      }
+
+      .layer::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        bottom: -19px;
+        width: 2px;
+        height: 18px;
+        background: currentColor;
+        opacity: 0.34;
+      }
+
+      .layer:last-of-type::after {
+        display: none;
+      }
+
+      .layer-blue {
+        color: var(--blue);
+        border-color: rgba(38, 99, 235, 0.32);
+        box-shadow: inset 0 0 0 1px rgba(38, 99, 235, 0.04);
+      }
+
+      .layer-green {
+        color: var(--green);
+        border-color: rgba(14, 159, 110, 0.32);
+      }
+
+      .layer-purple {
+        color: var(--purple);
+        border-color: rgba(107, 61, 240, 0.3);
+      }
+
+      .layer-orange {
+        color: var(--orange);
+        border-color: rgba(245, 158, 11, 0.3);
+      }
+
+      .layer-label {
+        display: grid;
+        grid-template-columns: 76px 1fr;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .layer-icon {
+        width: 76px;
+        height: 76px;
+        display: grid;
+        place-items: center;
+        border-radius: 22px;
+        font-size: 30px;
+        font-weight: 800;
+      }
+
+      .layer-blue .layer-icon {
+        background: var(--blue-soft);
+      }
+
+      .layer-green .layer-icon {
+        background: var(--green-soft);
+      }
+
+      .layer-purple .layer-icon {
+        background: var(--purple-soft);
+      }
+
+      .layer-orange .layer-icon {
+        background: var(--orange-soft);
+      }
+
+      .layer-label h2 {
+        margin: 0;
+        font-size: 29px;
+        line-height: 1;
+      }
+
+      .layer-label p {
+        margin: 6px 0 0;
+        color: var(--text);
+        font-size: 16px;
+        line-height: 1.42;
+      }
+
+      .detail-box {
+        min-height: 116px;
+        border-radius: 16px;
+        padding: 16px;
+        border: 1px dashed currentColor;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 250, 255, 0.94));
+      }
+
+      pre {
+        margin: 0;
+        white-space: pre-wrap;
+        font-family:
+          ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 16px;
+        line-height: 1.5;
+        color: var(--ink);
+      }
+
+      .token-grid,
+      .theme-grid,
+      .primitive-grid {
+        display: grid;
+        gap: 12px;
+      }
+
+      .token-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .token-chip,
+      .primitive-chip {
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        font-size: 15px;
+        font-weight: 700;
+        background: #fff;
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        color: var(--ink);
+        text-align: center;
+      }
+
+      .theme-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .theme-card {
+        border-radius: 16px;
+        padding: 14px;
+        background: #fff;
+        border: 1px solid rgba(15, 23, 42, 0.08);
+      }
+
+      .theme-card strong {
+        display: block;
+        font-size: 19px;
+        margin-bottom: 10px;
+      }
+
+      .theme-map {
+        display: grid;
+        gap: 8px;
+        color: var(--ink);
+        font-size: 14px;
+        line-height: 1.4;
+      }
+
+      .primitive-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+
+      .primitive-chip {
+        flex-direction: column;
+        gap: 8px;
+        min-height: 98px;
+        padding: 10px;
+      }
+
+      .swatch {
+        width: 38px;
+        height: 38px;
+        border-radius: 999px;
+        border: 1px solid rgba(15, 23, 42, 0.12);
+      }
+
+      .swatch-white {
+        background: #ffffff;
+      }
+
+      .swatch-black {
+        background: #121212;
+      }
+
+      .swatch-gray {
+        background: #f5f5f5;
+      }
+
+      .swatch-blue {
+        background: #3b82f6;
+      }
+
+      .swatch-green {
+        background: #22c55e;
+      }
+
+      .chip-title {
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .chip-subtitle {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .reasons {
+        display: grid;
+        gap: 12px;
+        margin-top: 18px;
+      }
+
+      .reason {
+        display: grid;
+        grid-template-columns: 44px 1fr;
+        gap: 12px;
+        align-items: start;
+        padding: 12px 12px;
+        border-radius: 16px;
+        background: var(--panel-strong);
+        border: 1px solid var(--line);
+      }
+
+      .reason-icon {
+        width: 44px;
+        height: 44px;
+        display: grid;
+        place-items: center;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #edf4ff, #f6f2ff);
+        color: var(--blue);
+        font-size: 22px;
+      }
+
+      .key-idea {
+        margin-top: 18px;
+        padding: 16px 18px;
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 18px;
+        align-items: center;
+      }
+
+      .idea-title {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .idea-badge {
+        width: 64px;
+        height: 64px;
+        display: grid;
+        place-items: center;
+        border-radius: 20px;
+        color: #fff;
+        font-size: 28px;
+        background: linear-gradient(135deg, var(--purple), #2663eb);
+        box-shadow: 0 18px 36px rgba(71, 76, 202, 0.26);
+      }
+
+      .idea-title h3 {
+        margin: 0;
+        font-size: 27px;
+        text-transform: uppercase;
+      }
+
+      .idea-title p {
+        margin: 6px 0 0;
+        color: var(--text);
+        font-size: 17px;
+        line-height: 1.45;
+      }
+
+      .idea-title .highlight {
+        color: var(--orange);
+        font-weight: 800;
+      }
+
+      .idea-flow {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 14px;
+        align-items: center;
+      }
+
+      .idea-step {
+        position: relative;
+        min-height: 102px;
+        display: grid;
+        justify-items: center;
+        align-content: start;
+        gap: 10px;
+        text-align: center;
+      }
+
+      .idea-step:not(:last-child)::after {
+        content: "→";
+        position: absolute;
+        right: -14px;
+        top: 18px;
+        color: var(--muted);
+        font-size: 28px;
+        font-weight: 700;
+      }
+
+      .idea-icon {
+        width: 56px;
+        height: 56px;
+        display: grid;
+        place-items: center;
+        border-radius: 18px;
+        color: #fff;
+        font-size: 24px;
+        font-weight: 800;
+        box-shadow: 0 14px 28px rgba(15, 23, 42, 0.12);
+      }
+
+      .idea-purple {
+        background: linear-gradient(135deg, #7a4cf3, #4d39f4);
+      }
+
+      .idea-indigo {
+        background: linear-gradient(135deg, #545ff7, #2663eb);
+      }
+
+      .idea-green {
+        background: linear-gradient(135deg, #13b881, #0f9f6d);
+      }
+
+      .idea-blue {
+        background: linear-gradient(135deg, #3494ff, #2663eb);
+      }
+
+      .idea-pink {
+        background: linear-gradient(135deg, #ee5ca7, #d94bcb);
+      }
+
+      .idea-step span {
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1.35;
+      }
+
+      @media (max-width: 1250px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        .key-idea {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 980px) {
+        .layer,
+        .key-idea {
+          grid-template-columns: 1fr;
+        }
+
+        .token-grid,
+        .theme-grid,
+        .primitive-grid,
+        .idea-flow {
+          grid-template-columns: 1fr;
+        }
+
+        .idea-step:not(:last-child)::after,
+        .layer::after {
+          display: none;
+        }
+
+        .hero p {
+          font-size: 20px;
+        }
+
+        .board-header {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header class="hero">
+        <h1>Dark Mode Implementation</h1>
+        <p>State-driven theming with design tokens</p>
+        <div class="hero-rule" aria-hidden="true"></div>
+      </header>
+
+      <section class="layout" aria-label="Dark mode architecture overview">
+        <aside class="side-panel">
+          <div class="pill-title">Runtime Flow</div>
+          <p class="side-intro">How the theme changes at runtime</p>
+          <div class="flow">
+            <article class="step">
+              <div class="step-badge">1</div>
+              <strong>User Action</strong>
+              <p>User clicks the theme toggle.</p>
+            </article>
+            <article class="step">
+              <div class="step-badge">2</div>
+              <strong>Theme State</strong>
+              <p><code>theme = "dark"</code></p>
+            </article>
+            <article class="step">
+              <div class="step-badge">3</div>
+              <strong>Root Update</strong>
+              <p><code>&lt;html data-theme="dark"&gt;</code></p>
+            </article>
+            <article class="step">
+              <div class="step-badge">4</div>
+              <strong>Style Update</strong>
+              <p>Token mapping changes and the browser repaints the UI.</p>
+            </article>
+          </div>
+        </aside>
+
+        <section class="board">
+          <div class="board-header">
+            Design System Architecture &nbsp;|&nbsp; How the theme system is built
+          </div>
+
+          <article class="layer layer-blue">
+            <div class="layer-label">
+              <div class="layer-icon">▣</div>
+              <div>
+                <h2>Components</h2>
+                <p>Components consume semantic tokens only, not hardcoded theme values.</p>
+              </div>
+            </div>
+            <div class="detail-box">
+              <pre>.card {
+  background: var(--surface-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+}</pre>
+            </div>
+          </article>
+
+          <article class="layer layer-green">
+            <div class="layer-label">
+              <div class="layer-icon">🏷</div>
+              <div>
+                <h2>Semantic Tokens</h2>
+                <p>Meaningful tokens that describe UI roles such as surface, text, border, and accent.</p>
+              </div>
+            </div>
+            <div class="detail-box">
+              <div class="token-grid">
+                <div class="token-chip">--surface-primary</div>
+                <div class="token-chip">--text-primary</div>
+                <div class="token-chip">--border-subtle</div>
+                <div class="token-chip">--surface-secondary</div>
+                <div class="token-chip">--text-secondary</div>
+                <div class="token-chip">--accent-primary</div>
+              </div>
+            </div>
+          </article>
+
+          <article class="layer layer-purple">
+            <div class="layer-label">
+              <div class="layer-icon">◫</div>
+              <div>
+                <h2>Theme Layer</h2>
+                <p>Each theme maps semantic tokens to primitive design values.</p>
+              </div>
+            </div>
+            <div class="detail-box">
+              <div class="theme-grid">
+                <div class="theme-card">
+                  <strong>Light Theme</strong>
+                  <div class="theme-map">
+                    <span>--surface-primary → var(--color-white)</span>
+                    <span>--text-primary → var(--color-gray-900)</span>
+                  </div>
+                </div>
+                <div class="theme-card">
+                  <strong>Dark Theme</strong>
+                  <div class="theme-map">
+                    <span>--surface-primary → var(--color-gray-900)</span>
+                    <span>--text-primary → var(--color-white)</span>
+                  </div>
+                </div>
+                <div class="theme-card">
+                  <strong>High Contrast</strong>
+                  <div class="theme-map">
+                    <span>--surface-primary → var(--color-black)</span>
+                    <span>--text-primary → var(--color-white)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="layer layer-orange">
+            <div class="layer-label">
+              <div class="layer-icon">⬚</div>
+              <div>
+                <h2>Primitive Tokens</h2>
+                <p>Raw design values such as colors, spacing, radius, and shadows.</p>
+              </div>
+            </div>
+            <div class="detail-box">
+              <div class="primitive-grid">
+                <div class="primitive-chip">
+                  <div class="swatch swatch-white"></div>
+                  <div class="chip-title">--color-white</div>
+                  <div class="chip-subtitle">#FFFFFF</div>
+                </div>
+                <div class="primitive-chip">
+                  <div class="swatch swatch-black"></div>
+                  <div class="chip-title">--color-gray-900</div>
+                  <div class="chip-subtitle">#121212</div>
+                </div>
+                <div class="primitive-chip">
+                  <div class="swatch swatch-gray"></div>
+                  <div class="chip-title">--color-gray-100</div>
+                  <div class="chip-subtitle">#F5F5F5</div>
+                </div>
+                <div class="primitive-chip">
+                  <div class="swatch swatch-blue"></div>
+                  <div class="chip-title">--color-blue-500</div>
+                  <div class="chip-subtitle">#3B82F6</div>
+                </div>
+                <div class="primitive-chip">
+                  <div class="swatch swatch-green"></div>
+                  <div class="chip-title">--color-green-500</div>
+                  <div class="chip-subtitle">#22C55E</div>
+                </div>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <aside class="side-panel">
+          <div class="pill-title">Why This Works</div>
+          <div class="reasons">
+            <article class="reason">
+              <div class="reason-icon">+</div>
+              <div>
+                <strong>Scalable</strong>
+                <p>Add new themes without changing component code.</p>
+              </div>
+            </article>
+            <article class="reason">
+              <div class="reason-icon">✓</div>
+              <div>
+                <strong>Consistent</strong>
+                <p>All components follow the same token system.</p>
+              </div>
+            </article>
+            <article class="reason">
+              <div class="reason-icon">↺</div>
+              <div>
+                <strong>Maintainable</strong>
+                <p>Update one token mapping and the UI updates everywhere.</p>
+              </div>
+            </article>
+            <article class="reason">
+              <div class="reason-icon">⚡</div>
+              <div>
+                <strong>Efficient</strong>
+                <p>Theme switching usually updates styles without changing component structure.</p>
+              </div>
+            </article>
+          </div>
+        </aside>
+      </section>
+
+      <section class="key-idea" aria-label="Key idea summary">
+        <div class="idea-title">
+          <div class="idea-badge">💡</div>
+          <div>
+            <h3>The Key Idea</h3>
+            <p>Switching theme means <span class="highlight">changing token mappings</span>, not changing components.</p>
+          </div>
+        </div>
+
+        <div class="idea-flow">
+          <div class="idea-step">
+            <div class="idea-icon idea-purple">☝</div>
+            <span>User clicks<br />toggle</span>
+          </div>
+          <div class="idea-step">
+            <div class="idea-icon idea-indigo">◔</div>
+            <span>Theme state<br />changes</span>
+          </div>
+          <div class="idea-step">
+            <div class="idea-icon idea-green">&lt;/&gt;</div>
+            <span>Root attribute<br />updates</span>
+          </div>
+          <div class="idea-step">
+            <div class="idea-icon idea-blue">◫</div>
+            <span>Token mapping<br />changes</span>
+          </div>
+          <div class="idea-step">
+            <div class="idea-icon idea-pink">▣</div>
+            <span>Browser repaints<br />the UI</span>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Common Implementation Issues</title>
+    <style>
+      :root {
+        --bg: #eef3ff;
+        --panel: rgba(255, 255, 255, 0.86);
+        --panel-strong: #ffffff;
+        --text: #10203f;
+        --muted: #5c6b8a;
+        --line: rgba(80, 112, 196, 0.18);
+        --shadow: 0 24px 70px rgba(26, 44, 88, 0.12);
+        --blue: #2663eb;
+        --purple: #6b3df0;
+        --green: #0e9f6e;
+        --orange: #f59e0b;
+        --red: #dc2626;
+        --red-soft: #fff1f2;
+        --orange-soft: #fff7e8;
+        --green-soft: #eafaf3;
+        --blue-soft: #edf4ff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top left, rgba(107, 61, 240, 0.1), transparent 28%),
+          radial-gradient(circle at top right, rgba(38, 99, 235, 0.12), transparent 24%),
+          linear-gradient(180deg, #f8fbff 0%, var(--bg) 100%);
+      }
+
+      .page {
+        width: min(1600px, 100vw);
+        min-height: 900px;
+        aspect-ratio: 16 / 9;
+        margin: 0 auto;
+        padding: 28px;
+      }
+
+      .hero {
+        text-align: center;
+        margin-bottom: 18px;
+      }
+
+      .hero h1 {
+        margin: 0;
+        font-size: 72px;
+        line-height: 0.96;
+        font-weight: 900;
+        text-transform: uppercase;
+        background: linear-gradient(90deg, #6b3df0 0%, #2663eb 48%, #0f172a 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .hero p {
+        margin: 10px auto 0;
+        max-width: 880px;
+        color: var(--muted);
+        font-size: 22px;
+      }
+
+      .hero-rule {
+        width: min(820px, 88%);
+        height: 2px;
+        margin: 14px auto 0;
+        border-radius: 999px;
+        background: linear-gradient(90deg, rgba(38, 99, 235, 0), rgba(38, 99, 235, 0.9), rgba(38, 99, 235, 0));
+      }
+
+      .issues-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .issue-card,
+      .bottom-band {
+        border: 1px solid var(--line);
+        border-radius: 26px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(12px);
+      }
+
+      .issue-card {
+        padding: 18px;
+      }
+
+      .issue-header {
+        display: grid;
+        grid-template-columns: 58px 1fr;
+        gap: 14px;
+        align-items: center;
+        margin-bottom: 14px;
+      }
+
+      .issue-icon {
+        width: 58px;
+        height: 58px;
+        display: grid;
+        place-items: center;
+        border-radius: 18px;
+        font-size: 28px;
+        font-weight: 900;
+      }
+
+      .icon-red {
+        color: var(--red);
+        background: var(--red-soft);
+      }
+
+      .icon-orange {
+        color: var(--orange);
+        background: var(--orange-soft);
+      }
+
+      .icon-green {
+        color: var(--green);
+        background: var(--green-soft);
+      }
+
+      .icon-blue {
+        color: var(--blue);
+        background: var(--blue-soft);
+      }
+
+      .issue-header h2 {
+        margin: 0;
+        font-size: 27px;
+      }
+
+      .issue-blocks {
+        display: grid;
+        gap: 10px;
+      }
+
+      .issue-block {
+        border-radius: 18px;
+        background: var(--panel-strong);
+        border: 1px solid var(--line);
+        padding: 14px;
+      }
+
+      .issue-block strong {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 15px;
+        text-transform: uppercase;
+        color: var(--purple);
+      }
+
+      .issue-block p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.45;
+      }
+
+      .bottom-band {
+        margin-top: 18px;
+        padding: 18px 20px;
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        gap: 18px;
+        align-items: center;
+      }
+
+      .band-title {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .band-badge {
+        width: 64px;
+        height: 64px;
+        display: grid;
+        place-items: center;
+        border-radius: 20px;
+        color: #fff;
+        font-size: 28px;
+        background: linear-gradient(135deg, var(--purple), #2663eb);
+      }
+
+      .band-title h3 {
+        margin: 0;
+        font-size: 28px;
+        text-transform: uppercase;
+      }
+
+      .band-title p {
+        margin: 6px 0 0;
+        color: var(--text);
+        font-size: 17px;
+        line-height: 1.45;
+      }
+
+      .band-list {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .band-item {
+        border-radius: 18px;
+        border: 1px solid var(--line);
+        background: var(--panel-strong);
+        padding: 14px;
+      }
+
+      .band-item strong {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 15px;
+      }
+
+      .band-item p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
+      @media (max-width: 980px) {
+        .issues-grid,
+        .bottom-band,
+        .band-list {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header class="hero">
+        <h1>Common Implementation Issues</h1>
+        <p>Where dark mode usually breaks down in real production apps</p>
+        <div class="hero-rule" aria-hidden="true"></div>
+      </header>
+
+      <section class="issues-grid">
+        <article class="issue-card">
+          <div class="issue-header">
+            <div class="issue-icon icon-red">◐</div>
+            <h2>Flash of Incorrect Theme</h2>
+          </div>
+          <div class="issue-blocks">
+            <div class="issue-block">
+              <strong>Why it happens</strong>
+              <p>The app renders in light mode first, then JavaScript switches to dark mode after the page is already visible.</p>
+            </div>
+            <div class="issue-block">
+              <strong>What to do</strong>
+              <p>Apply the initial theme before first paint and hydrate from saved preference or system preference as early as possible.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="issue-card">
+          <div class="issue-header">
+            <div class="issue-icon icon-orange">#</div>
+            <h2>Hardcoded Colors in Components</h2>
+          </div>
+          <div class="issue-blocks">
+            <div class="issue-block">
+              <strong>Why it happens</strong>
+              <p>Components still contain values like <code>#fff</code> or <code>#111827</code> instead of using semantic tokens.</p>
+            </div>
+            <div class="issue-block">
+              <strong>What to do</strong>
+              <p>Make components consume semantic tokens only, then keep theme-specific values inside the theme layer.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="issue-card">
+          <div class="issue-header">
+            <div class="issue-icon icon-green">⊡</div>
+            <h2>Missing Token Coverage</h2>
+          </div>
+          <div class="issue-blocks">
+            <div class="issue-block">
+              <strong>Why it happens</strong>
+              <p>The system covers background and text, but forgets hover, focus, disabled, border, shadow, or chart colors.</p>
+            </div>
+            <div class="issue-block">
+              <strong>What to do</strong>
+              <p>Audit UI states and build token coverage for interaction states, elevation, data visualization, and semantic feedback colors.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="issue-card">
+          <div class="issue-header">
+            <div class="issue-icon icon-blue">⇄</div>
+            <h2>Third-Party Components Drift</h2>
+          </div>
+          <div class="issue-blocks">
+            <div class="issue-block">
+              <strong>Why it happens</strong>
+              <p>Charts, editors, embedded widgets, and UI libraries do not automatically follow your token system.</p>
+            </div>
+            <div class="issue-block">
+              <strong>What to do</strong>
+              <p>Create adapter layers or theme bridges so external components receive the same semantic theme values.</p>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="bottom-band">
+        <div class="band-title">
+          <div class="band-badge">!</div>
+          <div>
+            <h3>Implementation Checklist</h3>
+            <p>Most dark mode bugs come from incomplete coverage, not from the toggle itself.</p>
+          </div>
+        </div>
+
+        <div class="band-list">
+          <article class="band-item">
+            <strong>Initial theme</strong>
+            <p>Set the right theme before the first visible render.</p>
+          </article>
+          <article class="band-item">
+            <strong>Token discipline</strong>
+            <p>Keep hardcoded colors out of components.</p>
+          </article>
+          <article class="band-item">
+            <strong>State coverage</strong>
+            <p>Include hover, focus, disabled, border, and shadow tokens.</p>
+          </article>
+          <article class="band-item">
+            <strong>Third-party audit</strong>
+            <p>Verify charts, editors, and external widgets follow the theme.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

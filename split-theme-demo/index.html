@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Split Theme Files Demo</title>
+    <link rel="stylesheet" href="./base.css" />
+    <link id="themeStylesheet" rel="stylesheet" href="./light-theme.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="toolbar">
+        <div>
+          <p class="eyebrow">Split theme files</p>
+          <h1>Dark mode bằng cách tách file theme</h1>
+        </div>
+        <button class="theme-toggle" type="button">Dùng dark theme</button>
+      </header>
+
+      <section class="layout" aria-label="Split theme files demo">
+        <article class="panel">
+          <h2>Billing overview</h2>
+          <p>
+            File <strong>base.css</strong> giữ layout và component structure.
+            File theme như <strong>light-theme.css</strong> hoặc
+            <strong>dark-theme.css</strong> chỉ định nghĩa màu sắc, border và
+            shadow.
+          </p>
+
+          <div class="actions">
+            <button class="primary-action" type="button">Pay invoice</button>
+            <button class="secondary-action" type="button">Download</button>
+          </div>
+
+          <div class="invoice-list">
+            <div class="invoice-row">
+              <span>INV-2048</span>
+              <strong>$1,240.00</strong>
+            </div>
+            <div class="invoice-row">
+              <span>INV-2049</span>
+              <strong>$860.00</strong>
+            </div>
+            <div class="invoice-row">
+              <span>INV-2050</span>
+              <strong>$2,100.00</strong>
+            </div>
+          </div>
+        </article>
+
+        <aside class="code-panel">
+          <p class="code-title">Theme switching</p>
+          <pre><code>&lt;link id="themeStylesheet"
+  rel="stylesheet"
+  href="./light-theme.css" /&gt;
+
+theme.href = "./dark-theme.css";</code></pre>
+        </aside>
+      </section>
+    </main>
+
+    <script>
+      const theme = document.getElementById("themeStylesheet");
+      const button = document.querySelector(".theme-toggle");
+
+      let currentTheme = "light";
+
+      button.addEventListener("click", () => {
+        currentTheme = currentTheme === "light" ? "dark" : "light";
+        theme.href =
+          currentTheme === "light" ? "./light-theme.css" : "./dark-theme.css";
+        button.textContent =
+          currentTheme === "light" ? "Dùng dark theme" : "Dùng light theme";
+      });
+    </script>
+  </body>
+</html>

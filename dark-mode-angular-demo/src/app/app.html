@@ -1,0 +1,197 @@
+<main class="page-shell">
+  <section class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow">Angular demo</p>
+      <h1>Dark mode with Angular Material and Chart.js</h1>
+      <p class="hero-text">
+        A single theme state drives both Angular Material components and a
+        third-party chart through semantic tokens and a chart adapter.
+      </p>
+    </div>
+
+    <mat-card class="control-card" appearance="outlined">
+      <mat-card-content>
+        <div class="control-grid">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>Theme mode</mat-label>
+            <mat-select
+              [value]="selectedMode"
+              (selectionChange)="setTheme($event.value)"
+            >
+              <mat-option value="system">System</mat-option>
+              <mat-option value="light">Light</mat-option>
+              <mat-option value="dark">Dark</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <button mat-flat-button class="primary-button" (click)="toggleTheme()">
+            Toggle
+          </button>
+        </div>
+
+        <div class="status-stack">
+          <div class="status-line">
+            <span class="label">Theme mode</span>
+            <mat-chip-set>
+              <mat-chip>{{ selectedMode }}</mat-chip>
+            </mat-chip-set>
+          </div>
+
+          <div class="status-line">
+            <span class="label">Resolved DOM theme</span>
+            <mat-chip-set>
+              <mat-chip highlighted>{{ resolvedTheme }}</mat-chip>
+            </mat-chip-set>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </section>
+
+  <section class="summary-grid">
+    <mat-card class="info-card" appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Shared Theme State</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p>
+          The app keeps one theme mode:
+          <code>system | light | dark</code>. The resolved theme is written to
+          the root element as <code>data-theme="light|dark"</code>.
+        </p>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="info-card" appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Integration Strategy</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="chip-list">
+          <span class="token-chip">Semantic tokens</span>
+          <span class="token-chip">Chart adapter</span>
+          <span class="token-chip">Material theme layer</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </section>
+
+  <section class="content-grid">
+    <mat-card class="chart-card" appearance="outlined">
+      <mat-card-header>
+        <div mat-card-avatar class="avatar chart-avatar">C</div>
+        <mat-card-title>Chart.js Theme Adapter</mat-card-title>
+        <mat-card-subtitle>
+          Chart.js receives colors mapped from semantic tokens.
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="chart-meta">
+          <div>
+            <strong>Revenue overview</strong>
+            <p>Custom adapter reads CSS variables from the root theme.</p>
+          </div>
+          <div class="delta">+12.4% MoM</div>
+        </div>
+
+        <div class="chart-frame">
+          <canvas #chartCanvas></canvas>
+        </div>
+
+        <div class="mapping-list">
+          <div class="mapping-row">
+            <code>--color-surface</code>
+            <span>chart background</span>
+          </div>
+          <div class="mapping-row">
+            <code>--color-text</code>
+            <span>axis and legend text</span>
+          </div>
+          <div class="mapping-row">
+            <code>--chart-grid</code>
+            <span>grid lines</span>
+          </div>
+          <div class="mapping-row">
+            <code>--chart-line</code>
+            <span>series color</span>
+          </div>
+        </div>
+
+        <div class="code-block">
+          <div class="code-title">Chart adapter</div>
+          <pre>const styles = getComputedStyle(document.documentElement);
+return &#123;
+  textColor: styles.getPropertyValue('--color-text').trim(),
+  gridColor: styles.getPropertyValue('--chart-grid').trim(),
+  lineColor: styles.getPropertyValue('--chart-line').trim()
+&#125;;</pre>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <div class="right-stack">
+      <mat-card class="material-card" appearance="outlined">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar material-avatar">M</div>
+          <mat-card-title>Angular Material Area</mat-card-title>
+          <mat-card-subtitle>
+            Material components follow the same root theme state.
+          </mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div class="form-grid">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Customer</mat-label>
+              <input matInput value="Acme Corp" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Status</mat-label>
+              <mat-select value="pending">
+                <mat-option value="pending">Pending</mat-option>
+                <mat-option value="paid">Paid</mat-option>
+                <mat-option value="overdue">Overdue</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="action-row">
+            <button mat-flat-button class="primary-button">Save</button>
+            <button mat-stroked-button>Cancel</button>
+          </div>
+
+          <p class="material-note">
+            In a real Angular Material app, the root theme class or root
+            attribute activates the light or dark Material theme, while custom
+            components still use app tokens.
+          </p>
+
+          <div class="code-block">
+            <div class="code-title">ThemeService</div>
+            <pre>setTheme(mode: 'light' | 'dark' | 'system') &#123;
+  localStorage.setItem('theme-mode', mode);
+  this.modeSubject.next(mode);
+  this.applyResolvedTheme();
+&#125;</pre>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="material-card" appearance="outlined">
+        <mat-card-header>
+          <mat-card-title>Why this setup works</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <ul class="reason-list">
+            <li>One source of truth for theme state</li>
+            <li>Chart.js gets a dedicated adapter layer</li>
+            <li>Angular Material stays on its own theming system</li>
+            <li>Custom components consume semantic tokens only</li>
+          </ul>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </section>
+</main>

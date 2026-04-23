@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="vi" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Semantic Tokens Dark Mode Demo</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      :root {
+        color-scheme: light;
+
+        --color-bg: #f8fafc;
+        --color-surface: #ffffff;
+        --color-surface-subtle: #f1f5f9;
+        --color-border: #d1d5db;
+        --color-text: #0f172a;
+        --color-text-muted: #475569;
+        --color-accent: #2563eb;
+        --color-accent-contrast: #ffffff;
+        --color-success: #059669;
+        --shadow-panel: 0 18px 48px rgba(15, 23, 42, 0.08);
+      }
+
+      [data-theme="dark"] {
+        color-scheme: dark;
+
+        --color-bg: #020617;
+        --color-surface: #0f172a;
+        --color-surface-subtle: #172033;
+        --color-border: #334155;
+        --color-text: #e2e8f0;
+        --color-text-muted: #94a3b8;
+        --color-accent: #60a5fa;
+        --color-accent-contrast: #0f172a;
+        --color-success: #34d399;
+        --shadow-panel: 0 22px 54px rgba(2, 6, 23, 0.45);
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        background: var(--color-bg);
+        color: var(--color-text);
+        transition:
+          background-color 160ms ease,
+          color 160ms ease,
+          border-color 160ms ease;
+      }
+
+      .page {
+        width: min(1024px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 48px 0;
+      }
+
+      .toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 28px;
+      }
+
+      .eyebrow {
+        margin: 0 0 8px;
+        color: var(--color-accent);
+        font-size: 13px;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 0;
+        max-width: 700px;
+        font-size: 40px;
+        line-height: 1.08;
+      }
+
+      .toolbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .theme-toggle {
+        min-height: 42px;
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        padding: 10px 15px;
+        background: var(--color-surface);
+        color: var(--color-text);
+        font: inherit;
+        font-weight: 750;
+        cursor: pointer;
+      }
+
+      .theme-select {
+        min-height: 42px;
+        min-width: 150px;
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        padding: 0 12px;
+        background: var(--color-surface);
+        color: var(--color-text);
+        font: inherit;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 20px;
+      }
+
+      .panel,
+      .tokens-panel {
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        background: var(--color-surface);
+        box-shadow: var(--shadow-panel);
+      }
+
+      .panel {
+        padding: 24px;
+      }
+
+      .panel h2 {
+        margin: 0 0 12px;
+        font-size: 24px;
+      }
+
+      .panel p {
+        margin: 0 0 20px;
+        color: var(--color-text-muted);
+        line-height: 1.65;
+      }
+
+      .status-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 22px;
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        padding: 14px 16px;
+        background: var(--color-surface-subtle);
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        min-height: 32px;
+        border-radius: 999px;
+        padding: 0 12px;
+        background: var(--color-accent);
+        color: var(--color-accent-contrast);
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .status-copy {
+        color: var(--color-text-muted);
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 22px;
+      }
+
+      .primary-action,
+      .secondary-action {
+        min-height: 42px;
+        border-radius: 8px;
+        padding: 10px 15px;
+        font: inherit;
+        font-weight: 750;
+        cursor: pointer;
+      }
+
+      .primary-action {
+        border: 0;
+        background: var(--color-accent);
+        color: var(--color-accent-contrast);
+      }
+
+      .secondary-action {
+        border: 1px solid var(--color-border);
+        background: var(--color-surface);
+        color: var(--color-text);
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+
+      .metric {
+        min-height: 98px;
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        padding: 14px;
+        background: var(--color-surface-subtle);
+      }
+
+      .metric strong {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 22px;
+      }
+
+      .metric span {
+        color: var(--color-text-muted);
+        font-size: 14px;
+      }
+
+      .metric.success strong {
+        color: var(--color-success);
+      }
+
+      .tokens-panel {
+        overflow: hidden;
+      }
+
+      .tokens-title {
+        margin: 0;
+        border-bottom: 1px solid var(--color-border);
+        padding: 14px 16px;
+        background: var(--color-surface-subtle);
+        font-weight: 800;
+      }
+
+      .tokens-list {
+        display: grid;
+        gap: 0;
+      }
+
+      .token-row {
+        display: grid;
+        grid-template-columns: 1.2fr 0.9fr auto;
+        align-items: center;
+        gap: 12px;
+        border-bottom: 1px solid var(--color-border);
+        padding: 14px 16px;
+      }
+
+      .token-row:last-child {
+        border-bottom: 0;
+      }
+
+      .token-name {
+        font-family:
+          ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 13px;
+      }
+
+      .token-usage {
+        color: var(--color-text-muted);
+        font-size: 14px;
+      }
+
+      .token-swatch {
+        width: 28px;
+        height: 28px;
+        border: 1px solid var(--color-border);
+        border-radius: 6px;
+        background: var(--swatch);
+      }
+
+      @media (max-width: 760px) {
+        .toolbar {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        h1 {
+          font-size: 32px;
+        }
+
+        .layout,
+        .metrics {
+          grid-template-columns: 1fr;
+        }
+
+        .toolbar-actions {
+          width: 100%;
+        }
+
+        .theme-select,
+        .theme-toggle {
+          width: 100%;
+        }
+
+        .token-row {
+          grid-template-columns: 1fr auto;
+        }
+
+        .token-usage {
+          grid-column: 1 / -1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header class="toolbar">
+        <div>
+          <p class="eyebrow">Modern approach</p>
+          <h1>Dark mode bằng semantic tokens</h1>
+        </div>
+        <div class="toolbar-actions">
+          <select class="theme-select" aria-label="Chọn theme mode">
+            <option value="system">System</option>
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
+          <button class="theme-toggle" type="button">Toggle theme</button>
+        </div>
+      </header>
+
+      <section class="layout" aria-label="Semantic tokens dark mode demo">
+        <article class="panel">
+          <h2>Operations dashboard</h2>
+          <p>
+            Component không dùng màu cứng như <strong>#ffffff</strong> hay
+            <strong>#111827</strong>. Thay vào đó, nó chỉ dùng token có ý nghĩa
+            như <strong>surface</strong>, <strong>text-muted</strong> hoặc
+            <strong>accent</strong>.
+          </p>
+
+          <div class="status-row">
+            <div>
+              <strong>Theme state</strong>
+              <div class="status-copy">
+                Chế độ hiện tại đọc từ <code>theme mode</code> và có thể follow
+                <code>prefers-color-scheme</code> khi chọn <code>system</code>.
+              </div>
+              <div class="token-usage">
+                Root dùng <code>data-theme="light|dark"</code>, còn state app
+                là <code>light | dark | system</code>.
+              </div>
+            </div>
+            <span class="status-pill" id="themeStatus">System</span>
+          </div>
+
+          <div class="actions">
+            <button class="primary-action" type="button">Deploy update</button>
+            <button class="secondary-action" type="button">View logs</button>
+          </div>
+
+          <div class="metrics">
+            <div class="metric">
+              <strong>248</strong>
+              <span>Requests / min</span>
+            </div>
+            <div class="metric success">
+              <strong>99.98%</strong>
+              <span>Uptime</span>
+            </div>
+            <div class="metric">
+              <strong>17 ms</strong>
+              <span>P95 latency</span>
+            </div>
+          </div>
+        </article>
+
+        <aside class="tokens-panel">
+          <p class="tokens-title">Semantic token map</p>
+          <div class="tokens-list">
+            <div class="token-row">
+              <span class="token-name">--color-bg</span>
+              <span class="token-usage">Trang tổng thể</span>
+              <span class="token-swatch" style="--swatch: var(--color-bg)"></span>
+            </div>
+            <div class="token-row">
+              <span class="token-name">--color-surface</span>
+              <span class="token-usage">Panel, card, button nền sáng</span>
+              <span class="token-swatch" style="--swatch: var(--color-surface)"></span>
+            </div>
+            <div class="token-row">
+              <span class="token-name">--color-text</span>
+              <span class="token-usage">Nội dung chính</span>
+              <span class="token-swatch" style="--swatch: var(--color-text)"></span>
+            </div>
+            <div class="token-row">
+              <span class="token-name">--color-text-muted</span>
+              <span class="token-usage">Mô tả phụ, metadata</span>
+              <span class="token-swatch" style="--swatch: var(--color-text-muted)"></span>
+            </div>
+            <div class="token-row">
+              <span class="token-name">--color-accent</span>
+              <span class="token-usage">CTA, highlight, emphasis</span>
+              <span class="token-swatch" style="--swatch: var(--color-accent)"></span>
+            </div>
+            <div class="token-row">
+              <span class="token-name">@media prefers-color-scheme</span>
+              <span class="token-usage">Input signal cho default theme</span>
+              <span class="token-swatch" style="--swatch: var(--color-surface-subtle)"></span>
+            </div>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <script>
+      const root = document.documentElement;
+      const select = document.querySelector(".theme-select");
+      const button = document.querySelector(".theme-toggle");
+      const themeStatus = document.getElementById("themeStatus");
+      const media = window.matchMedia("(prefers-color-scheme: dark)");
+
+      function resolveTheme(mode) {
+        if (mode === "system") {
+          return media.matches ? "dark" : "light";
+        }
+
+        return mode;
+      }
+
+      function applyTheme(mode) {
+        const resolvedTheme = resolveTheme(mode);
+
+        root.dataset.theme = resolvedTheme;
+        themeStatus.textContent =
+          mode === "system"
+            ? `System -> ${resolvedTheme}`
+            : mode.charAt(0).toUpperCase() + mode.slice(1);
+        button.textContent =
+          mode === "system"
+            ? "Toggle manual theme"
+            : mode === "dark"
+              ? "Chuyển sang light"
+              : "Chuyển sang dark";
+      }
+
+      select.addEventListener("change", () => {
+        applyTheme(select.value);
+      });
+
+      button.addEventListener("click", () => {
+        if (select.value === "system") {
+          select.value = root.dataset.theme === "dark" ? "light" : "dark";
+        } else {
+          select.value = select.value === "dark" ? "light" : "dark";
+        }
+
+        applyTheme(select.value);
+      });
+
+      if (typeof media.addEventListener === "function") {
+        media.addEventListener("change", () => {
+          if (select.value === "system") {
+            applyTheme("system");
+          }
+        });
+      } else if (typeof media.addListener === "function") {
+        media.addListener(() => {
+          if (select.value === "system") {
+            applyTheme("system");
+          }
+        });
+      }
+
+      applyTheme(select.value);
+    </script>
+  </body>
+</html>
