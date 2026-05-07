@@ -9,7 +9,152 @@
   font-family:
     Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
+.page-shell {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0 40px;
+}
 
+.hero {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 18px;
+  align-items: start;
+  margin-bottom: 18px;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: var(--color-accent);
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(34px, 5vw, 56px);
+  line-height: 1;
+}
+
+.hero-text {
+  margin: 14px 0 0;
+  max-width: 720px;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+.control-card,
+.material-card {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-lg);
+}
+
+.control-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: start;
+}
+
+.primary-button {
+  background: var(--color-accent) !important;
+  color: var(--color-accent-contrast) !important;
+}
+
+.status-stack {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.status-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: var(--color-surface-subtle);
+}
+
+.label {
+  color: var(--color-text-muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1.02fr 0.98fr;
+  gap: 18px;
+}
+
+.feature-stack {
+  display: grid;
+  gap: 14px;
+}
+
+.material-preview {
+  display: grid;
+  gap: 12px;
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.note-card {
+  border-left: 3px solid var(--color-accent);
+  padding-left: 12px;
+}
+
+.note-card strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.note-card p {
+  margin: 0;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+}
+
+.code-card {
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.code-title {
+  border-bottom: 1px solid var(--color-border);
+  padding: 10px 12px;
+  background: var(--color-surface-subtle);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+pre {
+  margin: 0;
+  overflow: auto;
+  padding: 12px;
+  background: var(--code-bg);
+  color: var(--color-text);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+@media (max-width: 960px) {
+  .hero,
+  .content-grid,
+  .control-grid {
+    grid-template-columns: 1fr;
+  }
+}
 * {
   box-sizing: border-box;
 }

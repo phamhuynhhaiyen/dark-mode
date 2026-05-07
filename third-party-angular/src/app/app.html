@@ -1,71 +1,104 @@
 <main class="page-shell">
-  <nav class="topbar" aria-label="Primary navigation">
-    <a class="brand" href="#">
-      <span class="brand-mark">D</span>
-      <span>DarkSpace</span>
-    </a>
-
-    <div class="nav-links" aria-label="Page sections">
-      <a href="#features">Features</a>
-      <a href="#pricing">Pricing</a>
-      <a href="#contact">Contact</a>
-    </div>
-  </nav>
-
-  <section class="hero" aria-labelledby="hero-title">
+  <section class="hero">
     <div class="hero-copy">
-      <p class="eyebrow">Simple dark mode page</p>
-      <h1 id="hero-title">Build a calm workspace for focused nights.</h1>
+      <p class="eyebrow">Angular demo</p>
+      <h1>One theme state, two libraries</h1>
       <p class="hero-text">
-        A clean Angular page with deep contrast, soft surfaces, and responsive content blocks.
+        Angular Material follows shared app theme state, while Chart.js uses a
+        runtime adapter that maps semantic tokens into chart config.
       </p>
-
-      <div class="hero-actions">
-        <a class="primary-action" href="#features">Explore</a>
-        <a class="secondary-action" href="#contact">Get started</a>
-      </div>
     </div>
 
-    <aside class="status-panel" aria-label="Project status">
-      <div class="panel-header">
-        <span>Live Preview</span>
-        <span class="status-dot"></span>
-      </div>
+    <mat-card class="control-card" appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Theme Controls</mat-card-title>
+      </mat-card-header>
 
-      <div class="metric">
-        <span>Uptime</span>
-        <strong>99.9%</strong>
-      </div>
-      <div class="metric">
-        <span>Tasks done</span>
-        <strong>128</strong>
-      </div>
-      <div class="metric">
-        <span>Theme</span>
-        <strong>Dark</strong>
-      </div>
-    </aside>
+      <mat-card-content>
+        <div class="control-grid">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>Theme mode</mat-label>
+            <mat-select
+              [value]="themeService.themeMode()"
+              (selectionChange)="setTheme($event.value)"
+            >
+              <mat-option value="system">System</mat-option>
+              <mat-option value="light">Light</mat-option>
+              <mat-option value="dark">Dark</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <button mat-flat-button class="primary-button" (click)="toggleTheme()">
+            Toggle
+          </button>
+        </div>
+
+        <div class="status-stack">
+          <div class="status-line">
+            <span class="label">Theme mode</span>
+            <mat-chip-set>
+              <mat-chip>{{ themeService.themeMode() }}</mat-chip>
+            </mat-chip-set>
+          </div>
+
+          <div class="status-line">
+            <span class="label">Resolved DOM theme</span>
+            <mat-chip-set>
+              <mat-chip highlighted>{{ themeService.resolvedTheme() }}</mat-chip>
+            </mat-chip-set>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
   </section>
 
-  <app-simple-chart />
+  <section class="content-grid">
+    <app-simple-chart />
 
-  <section class="feature-grid" id="features" aria-label="Features">
-    <article>
-      <span class="feature-icon">01</span>
-      <h2>Fast setup</h2>
-      <p>Minimal markup and scoped styles make this page easy to extend.</p>
-    </article>
+    <mat-card class="material-card" appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Angular Material Area</mat-card-title>
+        <mat-card-subtitle>
+          Material components use the same root theme state.
+        </mat-card-subtitle>
+      </mat-card-header>
 
-    <article>
-      <span class="feature-icon">02</span>
-      <h2>Responsive layout</h2>
-      <p>The hero and cards adapt cleanly from desktop down to mobile screens.</p>
-    </article>
+      <mat-card-content>
+        <div class="feature-stack">
+          <div class="material-preview">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Status</mat-label>
+              <mat-select value="pending">
+                <mat-option value="pending">Pending</mat-option>
+                <mat-option value="review">In review</mat-option>
+                <mat-option value="done">Done</mat-option>
+              </mat-select>
+            </mat-form-field>
 
-    <article>
-      <span class="feature-icon">03</span>
-      <h2>Balanced contrast</h2>
-      <p>Dark surfaces, readable text, and focused accent colors keep the UI clear.</p>
-    </article>
+            <div class="button-row">
+              <button mat-flat-button class="primary-button">Save</button>
+              <button mat-stroked-button>Cancel</button>
+            </div>
+          </div>
+
+          <div class="note-card">
+            <strong>Adapter + wrapper idea</strong>
+            <p>
+              Material is themed through its own component system. Chart.js is
+              wrapped and updated with a runtime adapter that reads CSS tokens.
+            </p>
+          </div>
+
+          <div class="code-card">
+            <div class="code-title">ThemeService</div>
+            <pre>setTheme(mode: 'light' | 'dark' | 'system') &#123;
+  localStorage.setItem('theme-mode', mode);
+  this.mode.set(mode);
+  this.applyTheme(mode);
+&#125;</pre>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
   </section>
 </main>
